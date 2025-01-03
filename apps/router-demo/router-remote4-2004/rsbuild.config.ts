@@ -14,6 +14,9 @@ export default defineConfig({
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
     },
   },
+  dev: {
+    writeToDisk: true,
+  },
   server: {
     port: 2004,
   },

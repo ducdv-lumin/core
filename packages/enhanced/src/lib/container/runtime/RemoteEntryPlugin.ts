@@ -1,6 +1,25 @@
 import type { Compiler, WebpackPluginInstance } from 'webpack';
 import pBtoa from 'btoa';
 
+const charMap: Record<string, string> = {
+  '<': '\\u003C',
+  '>': '\\u003E',
+  '/': '\\u002F',
+  '\\': '\\\\',
+  '\b': '\\b',
+  '\f': '\\f',
+  '\n': '\\n',
+  '\r': '\\r',
+  '\t': '\\t',
+  '\0': '\\0',
+  '\u2028': '\\u2028',
+  '\u2029': '\\u2029',
+};
+
+function escapeUnsafeChars(str: string) {
+  return str.replace(/[<>\b\f\n\r\t\0\u2028\u2029]/g, (x) => charMap[x]);
+}
+
 export class RemoteEntryPlugin implements WebpackPluginInstance {
   readonly name = 'VmokRemoteEntryPlugin';
   private _name: string;
@@ -13,12 +32,14 @@ export class RemoteEntryPlugin implements WebpackPluginInstance {
 
   apply(compiler: Compiler): void {
     let code;
+    const sanitizedPublicPath = escapeUnsafeChars(this._getPublicPath);
+
     if (!this._getPublicPath.startsWith('function')) {
       code = `${
         compiler.webpack.RuntimeGlobals.publicPath
-      } = new Function(${JSON.stringify(this._getPublicPath)})()`;
+      } = new Function(${JSON.stringify(sanitizedPublicPath)})()`;
     } else {
-      code = `(${this._getPublicPath})()`;
+      code = `(${sanitizedPublicPath})()`;
     }
     const base64Code = pBtoa(code);
     const dataUrl = `data:text/javascript;base64,${base64Code}`;
