@@ -29,7 +29,7 @@ export default defineConfig({
       },
       shared: ['react', 'react-dom'],
       // getPublicPath: `return 'http://localhost:2004/'`,
-      getPublicPath: `return 'http://localhost:2004/'`,
+      getPublicPath: `function(){return 'http://localhost:2004/'}`,
     }),
   ],
 });

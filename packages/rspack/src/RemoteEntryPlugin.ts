@@ -39,7 +39,9 @@ export class RemoteEntryPlugin implements RspackPluginInstance {
         compiler.webpack.RuntimeGlobals.publicPath
       } = new Function(${JSON.stringify(sanitizedPublicPath)})()`;
     } else {
-      code = `(${sanitizedPublicPath})()`;
+      code = `${
+        compiler.webpack.RuntimeGlobals.publicPath
+      } = (${sanitizedPublicPath})()`;
     }
     const base64Code = pBtoa(code);
     const dataUrl = `data:text/javascript;base64,${base64Code}`;
