@@ -17,7 +17,12 @@ const charMap: Record<string, string> = {
 };
 
 function escapeUnsafeChars(str: string) {
-  return str.replace(/[<>\b\f\n\r\t\0\u2028\u2029]/g, (x) => charMap[x]);
+  return str
+    .replace(/[<>\b\f\n\r\t\0\u2028\u2029]/g, (x) => charMap[x])
+    .replace(
+      /[\u0022\u0027\u0060]/g,
+      (x) => `\\u${x.charCodeAt(0).toString(16).padStart(4, '0')}`,
+    );
 }
 
 export class RemoteEntryPlugin implements RspackPluginInstance {
