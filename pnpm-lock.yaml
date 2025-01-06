@@ -2554,9 +2554,6 @@ importers:
       '@rspack/core':
         specifier: ^1.0.2
         version: 1.0.8(@swc/helpers@0.5.13)
-      '@types/btoa':
-        specifier: 1.2.5
-        version: 1.2.5
 
   packages/runtime:
     dependencies:

@@ -34,7 +34,6 @@
     "@module-federation/sdk": "workspace:*"
   },
   "devDependencies": {
-    "@types/btoa": "1.2.5",
     "@rspack/core": "^1.0.2"
   },
   "exports": {

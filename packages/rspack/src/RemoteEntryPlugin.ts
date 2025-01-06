@@ -1,4 +1,5 @@
 import type { Compiler, RspackPluginInstance } from '@rspack/core';
+// @ts-ignore
 import pBtoa from 'btoa';
 
 const charMap: Record<string, string> = {
@@ -39,9 +40,7 @@ export class RemoteEntryPlugin implements RspackPluginInstance {
         compiler.webpack.RuntimeGlobals.publicPath
       } = new Function(${JSON.stringify(sanitizedPublicPath)})()`;
     } else {
-      code = `${
-        compiler.webpack.RuntimeGlobals.publicPath
-      } = (${sanitizedPublicPath})()`;
+      code = `(${sanitizedPublicPath}(${compiler.webpack.RuntimeGlobals.publicPath}))`;
     }
     const base64Code = pBtoa(code);
     const dataUrl = `data:text/javascript;base64,${base64Code}`;
