@@ -34,7 +34,9 @@ export class HandlebarsAPI {
     }
     await outputFs(
       target,
-      renderString(resourceValue.content, parameters),
+      templateResource.resourceKey.endsWith('.handlebars')
+        ? renderString(resourceValue.content, parameters)
+        : resourceValue.content,
       outputFilePath,
       { encoding: 'utf-8' },
     );

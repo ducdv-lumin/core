@@ -1,6 +1,5 @@
 import { Helmet } from '@modern-js/runtime/head';
 import './index.css';
-import { ComponentInspector } from '../components/ComponentInspector';
 import Header from '../components/Header';
 import Description from '../components/Description';
 import Footer from '../components/Footer';
@@ -16,17 +15,9 @@ const Index = () => (
     </Helmet>
 
     <div className="landing-page">
-      <ComponentInspector componentName="Header" mfName="provider">
-        <Header />
-      </ComponentInspector>
-
-      <ComponentInspector componentName="Description" mfName="provider">
-        <Description />
-      </ComponentInspector>
-
-      <ComponentInspector componentName="Footer" mfName="provider">
-        <Footer />
-      </ComponentInspector>
+      <Header />
+      <Description />
+      <Footer />
     </div>
   </div>
 );

@@ -4,6 +4,7 @@
  */
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import {
   cancel,
   isCancel,
@@ -17,6 +18,10 @@ import minimist from 'minimist';
 import { logger } from 'rslog';
 import { FsMaterial } from './materials/FsMaterial';
 import { HandlebarsAPI } from './handlebars';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const packageDir = path.resolve(__dirname, '..');
 
 type Argv = {
   help?: boolean;
@@ -93,9 +98,11 @@ function checkCancel<T>(value: unknown) {
  * 5. Input: '/root/path/to/foo'
  *    Output: folder -> `'/root/path/to/foo'` folder, `package.json#name` -> `foo`
  */
-function formatDir(input: string) {
+function formatProjectName(input: string) {
+  const formatted = input.trim().replace(/\/+$/g, '');
   return {
-    targetDir: input.trim().replace(/\/+$/g, ''),
+    packageName: input,
+    targetDir: formatted,
   };
 }
 
@@ -116,37 +123,6 @@ async function getAppTemplateName(
 ) {
   if (template) {
     return `${template}-ts`;
-  }
-
-  let providerInfo: ProviderInfo = {
-    name: '',
-    entry: '',
-  };
-
-  if (roleType === 'consumer') {
-    const providerName = checkCancel<string>(
-      await text({
-        message:
-          'Please input your provider name (You can skip by press "enter"):',
-        defaultValue: '',
-      }),
-    );
-
-    if (providerName) {
-      providerInfo.name = providerName;
-
-      const providerEntry = checkCancel<string>(
-        await text({
-          message: `Please input your provider("${providerName}") entry:`,
-          validate(value) {
-            if (value.length === 0) {
-              return 'Entry is required';
-            }
-          },
-        }),
-      );
-      providerInfo.entry = providerEntry;
-    }
   }
 
   return `${roleType}-${framework}-ts`;
@@ -187,7 +163,7 @@ async function getLibTemplateName({ template }: Argv) {
     return `${roleType}-${templateName}-ts`;
   }
 
-  return `${roleType}-${templateName}-[${Object.keys(tools)}]-ts`;
+  return `${roleType}-${templateName}-${tools[0]}-ts`;
 }
 
 function getTemplateName(
@@ -263,7 +239,7 @@ async function forgeTemplate({
     },
     argv,
   );
-  const material = new FsMaterial(__dirname);
+  const material = new FsMaterial(packageDir);
 
   const renderTemplate = async (templateDir: string) => {
     const templatePattern = `${templateDir}**/*`;
@@ -331,24 +307,20 @@ export async function create({
   const pkgInfo = pkgFromUserAgent(process.env['npm_config_user_agent']);
   const pkgManager = pkgInfo ? pkgInfo.name : 'npm';
 
-  const mfName =
-    argv.dir ??
-    checkCancel<string>(
-      await text({
-        message: 'Please input Module Federation name:',
-        placeholder: 'mf-project-name',
-        defaultValue: 'mf-project-name',
-        validate(value) {
-          if (value.length === 0) {
-            return 'Name is required';
-          }
-        },
-      }),
-    );
+  const mfName = checkCancel<string>(
+    await text({
+      message: 'Please input Module Federation name:',
+      placeholder: 'mf_project_name',
+      defaultValue: 'mf_project_name',
+      validate(value) {
+        if (value.length === 0) {
+          return 'Name is required';
+        }
+      },
+    }),
+  );
 
-  const dir = argv.dir || 'mf-project';
-
-  const { targetDir } = formatDir(dir);
+  const { targetDir } = formatProjectName(path.join(argv.dir || '', mfName));
   const distFolder = path.isAbsolute(targetDir)
     ? targetDir
     : path.join(cwd, targetDir);

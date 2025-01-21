@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { create } from './create';
 
 interface Template {
